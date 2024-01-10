@@ -3,7 +3,7 @@ import Container from "./components/Container";
 import HomeBanner from "./components/HomeBanner";
 import { products } from "@/utilities/products";
 import { truncate } from "@/utilities/truncut";
-import ProductCard from "./components/ProductCard/productCard";
+import ProductCard from "./components/products/productCard";
 
 export default function Home() {
   return (
