@@ -5,6 +5,8 @@ import { useCallback, useState } from "react";
 
 import SetColor from "./../../components/products/setColor";
 import SetQuantity from "@/app/components/products/setQuantity";
+import Button from "@/app/components/button";
+import ProductImage from "@/app/components/products/productImage";
 
 interface ProductDetailsProp {
   product: any;
@@ -14,6 +16,7 @@ export type CartProductType = {
   name: string;
   description: string;
   category: string;
+  brand: string;
   selectedImg: SelectedImgType;
   quantity: number;
   price: number;
@@ -27,12 +30,13 @@ const Harizontal = () => {
   return <hr className="w-[50%] my-3" />;
 };
 
-const ProductDetails = ({ product }: any) => {
+const ProductDetails: React.FC<ProductDetailsProp> = ({ product }) => {
   const [cartProduct, setCartProduct] = useState<CartProductType>({
     id: product.id,
     name: product.name,
     description: product.description,
     category: product.category,
+    brand: product.brand,
     selectedImg: { ...product.images[0] },
     quantity: 1,
     price: product.price,
@@ -41,7 +45,11 @@ const ProductDetails = ({ product }: any) => {
     product.reviews.reduce((acc: number, item: any) => item.rating + acc, 0) /
     product.reviews.length;
   const handleColorSelect = useCallback(
-    (vale: SelectedImgType) => {},
+    (value: SelectedImgType) => {
+      setCartProduct((prev) => {
+        return { ...prev, selectedImg: value };
+      });
+    },
     [cartProduct.selectedImg]
   );
   const handleQtyDecrease = useCallback(() => {
@@ -53,13 +61,20 @@ const ProductDetails = ({ product }: any) => {
     });
   }, [cartProduct]);
   const handleQtyIncrease = useCallback(() => {
+    if (cartProduct.quantity === 99) {
+      return;
+    }
     setCartProduct((prev) => {
       return { ...prev, quantity: prev.quantity + 1 };
     });
   }, [cartProduct]);
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-      <div>images</div>
+      <ProductImage
+        cartProduct={cartProduct}
+        product={product}
+        handleColorSelect={handleColorSelect}
+      />
       <div className="flex flex-col gap-2 text-slate-500 text-sm">
         <h2 className="text-3xl font-medium text-slate-700">{product.name}</h2>
         <div className="flex gap-3 items-center">
@@ -95,7 +110,9 @@ const ProductDetails = ({ product }: any) => {
           handleQtyDecrease={handleQtyDecrease}
         />
         <Harizontal />
-        <div>add to card</div>
+        <div className="max-w-[300px]">
+          <Button lable="Add to card" onClick={() => {}} />
+        </div>
       </div>
     </div>
   );
