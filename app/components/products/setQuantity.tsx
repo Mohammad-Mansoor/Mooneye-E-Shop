@@ -2,7 +2,7 @@
 
 import { CartProductType } from "@/app/Product/[productid]/productDetails";
 
-interface SetQuantityProps {
+interface SetQtyProps {
   cartCounter?: boolean;
   cartProduct: CartProductType;
   handleQtyIncrease: () => void;
@@ -10,7 +10,7 @@ interface SetQuantityProps {
 }
 const btnStyle = "border-[1.2px] border-slate-300 px-2 rounded";
 
-const SetQuantity: React.FC<SetQuantityProps> = ({
+const SetQuantity: React.FC<SetQtyProps> = ({
   cartCounter,
   cartProduct,
   handleQtyDecrease,
