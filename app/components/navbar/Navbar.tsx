@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Container from "../Container";
+import CartCount from "./cartCount";
 
 const Navbar = () => {
   return (
@@ -10,7 +11,9 @@ const Navbar = () => {
             <Link href="/">Moon Eye</Link>
             <div className="hidden md:block">search</div>
             <div className="flex justify-between items-center gap-8 md:gap-12">
-              <div>card count</div>
+              <div>
+                <CartCount />
+              </div>
               <div>User menu</div>
             </div>
           </div>
