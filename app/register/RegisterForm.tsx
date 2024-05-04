@@ -1,14 +1,23 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Heading from "../components/Heading";
 import Input from "../components/inputs/input";
 import { FieldValues, useForm, SubmitHandler } from "react-hook-form";
 import Button from "../components/button";
 import Link from "next/link";
 import { FaGoogle } from "react-icons/fa";
+import axios from "axios";
+import { signIn } from "next-auth/react";
+import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
+import { SafeUser } from "@/types";
 
-const RegisterForm = () => {
+interface RegisterFormProps {
+  currentUser: SafeUser | null;
+}
+
+const RegisterForm: React.FC<RegisterFormProps> = ({ currentUser }) => {
   const [isLoading, setIsLoading] = useState(false);
   const {
     register,
@@ -21,11 +30,44 @@ const RegisterForm = () => {
       password: "",
     },
   });
+  const router = useRouter();
+  useEffect(() => {
+    if (currentUser) {
+      router.push("/cart");
+      router.refresh();
+    }
+  }, [currentUser]);
 
   const onSubmit: SubmitHandler<FieldValues> = (data) => {
     setIsLoading(true);
-    console.log(data);
+    axios
+      .post("/api/register", data)
+      .then(() => {
+        toast.success("account successfully created");
+        signIn("credentials", {
+          email: data.email,
+          password: data.password,
+          redirect: false,
+        }).then((callback) => {
+          if (callback?.ok) {
+            console.log(data);
+            router.push("/cart");
+            router.refresh();
+            toast.success("logged In");
+          }
+          if (callback?.error) {
+            toast.error(callback.error);
+          }
+        });
+      })
+      .catch(() => toast.error("Something Went wrong"))
+      .finally(() => {
+        setIsLoading(false);
+      });
   };
+  if (currentUser) {
+    return <p className="text-center">Logged in, Redirecting...</p>;
+  }
   return (
     <>
       <Heading title="sign up for E-Shop" />
@@ -33,7 +75,9 @@ const RegisterForm = () => {
         outline
         lable="Sign up with Google"
         icon={FaGoogle}
-        onClick={() => {}}
+        onClick={() => {
+          signIn("google");
+        }}
       />
       <hr className="bg-slate-300 w-full h-px" />
       <Input
