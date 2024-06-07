@@ -1,5 +1,7 @@
 //success fo chatgpt code
 
+
+
 import Stripe from "stripe";
 import prisma from "@/libs/prismadb";
 import { NextResponse } from "next/server";
@@ -36,39 +38,24 @@ export async function POST(request: Request) {
     };
 
     // Create a description for the payment intent
-    const description = items
-      .map((item) => `${item.name} (${item.quantity}x)`)
-      .join(", ");
+    const description = items.map(item => `${item.name} (${item.quantity}x)`).join(", ");
 
     if (payment_intent_id) {
-      const current_intent = await stripe.paymentIntents.retrieve(
-        payment_intent_id
-      );
+      const current_intent = await stripe.paymentIntents.retrieve(payment_intent_id);
 
       if (current_intent) {
-        const updated_intent = await stripe.paymentIntents.update(
-          payment_intent_id,
-          {
-            amount: total,
-            description, // Add description here
-          }
-        );
+        const updated_intent = await stripe.paymentIntents.update(payment_intent_id, {
+          amount: total,
+          description, // Add description here
+        });
 
         const [existing_order] = await Promise.all([
-          prisma.order.findFirst({
-            where: { paymentIntentId: payment_intent_id },
-          }),
-          prisma.order.update({
-            where: { paymentIntentId: payment_intent_id },
-            data: { amount: total, products: items },
-          }),
+          prisma.order.findFirst({ where: { paymentIntentId: payment_intent_id } }),
+          prisma.order.update({ where: { paymentIntentId: payment_intent_id }, data: { amount: total, products: items } }),
         ]);
 
         if (!existing_order) {
-          return NextResponse.json(
-            { error: "Invalid Payment Intent" },
-            { status: 400 }
-          );
+          return NextResponse.json({ error: "Invalid Payment Intent" }, { status: 400 });
         }
         return NextResponse.json({ paymentIntent: updated_intent });
       }
@@ -77,7 +64,7 @@ export async function POST(request: Request) {
         amount: total,
         currency: "usd",
         automatic_payment_methods: { enabled: true },
-        description: "this is the description!!",
+        description: "this is the description!!"
       });
 
       orderData.paymentIntentId = paymentIntent.id;
@@ -86,9 +73,6 @@ export async function POST(request: Request) {
     }
   } catch (error) {
     console.error("Error processing payment:", error);
-    return NextResponse.json(
-      { error: "Internal Server Error" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }
