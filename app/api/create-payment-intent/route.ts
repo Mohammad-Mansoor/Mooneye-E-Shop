@@ -1,5 +1,3 @@
-//success fo chatgpt code
-
 import Stripe from "stripe";
 import prisma from "@/libs/prismadb";
 import { NextResponse } from "next/server";
@@ -54,21 +52,18 @@ export async function POST(request: Request) {
           }
         );
 
-        const [existing_order] = await Promise.all([
-          prisma.order.findFirst({
-            where: { paymentIntentId: payment_intent_id },
-          }),
-          prisma.order.update({
-            where: { paymentIntentId: payment_intent_id },
-            data: { amount: total, products: items },
-          }),
-        ]);
+        // Ensure that the order is updated only once
+        const existing_order = await prisma.order.findFirst({
+          where: { paymentIntentId: payment_intent_id },
+        });
 
         if (!existing_order) {
-          return NextResponse.json(
-            { error: "Invalid Payment Intent" },
-            { status: 400 }
-          );
+          await prisma.order.create({ data: orderData });
+        } else {
+          await prisma.order.update({
+            where: { paymentIntentId: payment_intent_id },
+            data: { amount: total, products: items },
+          });
         }
         return NextResponse.json({ paymentIntent: updated_intent });
       }
@@ -77,7 +72,7 @@ export async function POST(request: Request) {
         amount: total,
         currency: "usd",
         automatic_payment_methods: { enabled: true },
-        description: "this is the description!!",
+        description,
       });
 
       orderData.paymentIntentId = paymentIntent.id;

@@ -18,7 +18,7 @@ const UserMenu: React.FC<UserMenuProps> = ({ currentUser }) => {
     setIsOpen((prev) => !prev);
   }, []);
   const isCurrentUser = currentUser ? true : false;
-  console.log("this is current user image >>>", currentUser?.image);
+
   return (
     <>
       <div className="relative z-30">

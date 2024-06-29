@@ -1,16 +1,14 @@
-"use client";
-
-import CartProvider from "@/providers/CartProvider";
 import Container from "../components/Container";
 import CartClient from "./CartClient";
-import { CartContext, useCart } from "@/hooks/useCart";
-import { useContext } from "react";
 
-const Cart = () => {
+import { getCurrentUser } from "@/actions/getCurrentUser";
+
+const Cart = async () => {
+  const currentUser = await getCurrentUser();
   return (
     <div className="pt-8">
       <Container>
-        <CartClient />
+        <CartClient currentUser={currentUser} />
         {/* <h1>tis asdkf;asjfd</h1> */}
       </Container>
     </div>

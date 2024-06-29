@@ -1,4 +1,4 @@
-// "use client";
+"use client";
 
 import { useCart } from "@/hooks/useCart";
 import Link from "next/link";
@@ -8,8 +8,15 @@ import Button from "../components/button";
 import ItemContent from "./ItemContent";
 import { formatPrice } from "@/utilities/formatPrice";
 import { useRouter } from "next/navigation";
+import { SafeUser } from "@/types";
 
-const CartClient = () => {
+interface CartClient {
+  currentUser: SafeUser | null;
+}
+
+const CartClient: React.FC<CartClient> = ({ currentUser }) => {
+  console.log(currentUser, " this is cartClient page user inforamtion");
+
   const {
     handleAddProductToCart,
     cartTotalAmount,
@@ -17,7 +24,6 @@ const CartClient = () => {
     handleClearCart,
   } = useCart();
   const router = useRouter();
-  //   console.log(cartProducts);
 
   if (!cartProducts || cartProducts.length === 0) {
     return (
@@ -70,9 +76,10 @@ const CartClient = () => {
             taxes and shipping calculate at checkout
           </p>
           <Button
-            lable="Checkout"
+            lable={!currentUser ? "Login To Checkout" : "checkout "}
+            outline={currentUser ? false : true}
             onClick={() => {
-              router.push("/checkout");
+              currentUser ? router.push("/checkout") : router.push("/login");
             }}
           />
           <Link

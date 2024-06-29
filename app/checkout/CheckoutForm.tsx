@@ -8,7 +8,6 @@ import {
   useElements,
   useStripe,
 } from "@stripe/react-stripe-js";
-import { Result } from "postcss";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import Heading from "../components/Heading";
@@ -26,41 +25,42 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
   const { cartTotalAmount, handleClearCart, handleSetPaymentIntent } =
     useCart();
   const stripe = useStripe();
-  //   console.log(stripe, "this is stripe");
   const elements = useElements();
-  //   console.log(elements, "this is elements");
   const [isLoading, setIsLoading] = useState(false);
   const formatedPrice = formatPrice(cartTotalAmount);
+
   useEffect(() => {
-    if (!stripe) {
-      return;
-    }
-    if (!clientSecret) {
+    if (!stripe || !clientSecret) {
       return;
     }
     handleSetPaymentSuccess(false);
-  }, [stripe]);
+  }, [stripe, clientSecret]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!stripe || !elements) {
       return;
     }
     setIsLoading(true);
-    stripe
-      .confirmPayment({
+    try {
+      const result = await stripe.confirmPayment({
         elements,
         redirect: "if_required",
-      })
-      .then((result) => {
-        if (!result.error) {
-          toast.success("Payment Successfully done");
-
-          handleClearCart();
-          handleSetPaymentSuccess(true);
-          handleSetPaymentIntent(null);
-        }
-        setIsLoading(false);
       });
+      if (!result.error) {
+        toast.success("Payment Successfully done");
+        handleClearCart();
+        handleSetPaymentSuccess(true);
+        handleSetPaymentIntent(null);
+      } else {
+        toast.error(result.error.message || "Payment failed");
+      }
+    } catch (error) {
+      console.error("Error during payment:", error);
+      toast.error("An error occurred during payment");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -72,7 +72,7 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
       <AddressElement
         options={{ mode: "shipping", allowedCountries: ["US", "AF"] }}
       />
-      <h2 className="font-semibold mt-4 mb-2">payment Information</h2>
+      <h2 className="font-semibold mt-4 mb-2">Payment Information</h2>
       <PaymentElement id="payment-element" options={{ layout: "tabs" }} />
       <div className="py-4 text-center text-slate-700 text-2xl font-bold ">
         Total: {formatedPrice}

@@ -19,8 +19,7 @@ const CheckoutClient = () => {
   const [clientSecret, setClientSecret] = useState("");
   const [paymentSuccess, setPaymentSuccess] = useState(false);
   const router = useRouter();
-  console.log("paymentIntent", paymentIntent);
-  console.log("clientSecret", clientSecret);
+
   useEffect(() => {
     // create a payment as soon as the page loaded
     if (cartProducts) {
