@@ -1,5 +1,4 @@
 import prisma from "@/libs/prismadb";
-
 export interface IProductParams {
   category?: string | null;
   searchTerm?: string | null;
@@ -8,13 +7,14 @@ export interface IProductParams {
 export default async function getProducts(params: IProductParams) {
   try {
     const { category, searchTerm } = params;
-    const searchString = searchTerm || "";
-
+    let searchString = searchTerm;
+    if (!searchTerm) {
+      searchString = "";
+    }
     let query: any = {};
     if (category) {
       query.category = category;
     }
-
     const products = await prisma.product.findMany({
       where: {
         ...query,
@@ -24,8 +24,6 @@ export default async function getProducts(params: IProductParams) {
               contains: searchString,
               mode: "insensitive",
             },
-          },
-          {
             description: {
               contains: searchString,
               mode: "insensitive",
@@ -33,21 +31,20 @@ export default async function getProducts(params: IProductParams) {
           },
         ],
       },
+
       include: {
         reviews: {
           include: {
             user: true,
           },
+          orderBy: {
+            createdDate: "desc",
+          },
         },
       },
-
-      // orderBy: {
-      //   createdDate: "desc",
-      // },
     });
     return products;
   } catch (error: any) {
-    console.error("Error fetching products:", error);
-    throw new Error("An error occurred while fetching products");
+    // throw new Error(error);
   }
 }

@@ -19,9 +19,6 @@ import {
   getDownloadURL,
 } from "firebase/storage";
 import firebaseApp from "@/libs/firebase";
-import { rejects } from "assert";
-import { resolve } from "path";
-import { error } from "console";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 

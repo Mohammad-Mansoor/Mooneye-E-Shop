@@ -35,7 +35,7 @@ export async function POST(request: Request) {
 
     // Create a description for the payment intent
     const description = items
-      .map((item) => `${item.name} (${item.quantity}x)`)
+      .map((item: any) => `${item.name} (${item.quantity}x)`)
       .join(", ");
 
     if (payment_intent_id) {
