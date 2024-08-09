@@ -21,7 +21,7 @@ export default async function getOrderById(params: IParams) {
 
     return order;
   } catch (error: any) {
-    console.error("Error fetching order by ID:", error);
-    throw new Error("Error fetching order by ID");
+    // console.error("Error fetching order by ID:", error);
+    // throw new Error("Error fetching order by ID");
   }
 }
